@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Zilan’s Basket</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #FDFBF7;
+            --bg-card: #FFFFFF;
+            --bg-sidebar: #F5EFEB;
+            --text-main: #2C2624;
+            --text-muted: #7E7470;
+            --accent: #B8977F;
+            --accent-hover: #9E7D65;
+            --border: #E8E2D9;
+            --shadow: 0 4px 20px rgba(44, 38, 36, 0.04);
+            --radius-sm: 10px;
+            --radius-md: 16px;
+            --radius-lg: 24px;
+            --transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        [data-theme="dark"] {
+            --bg-main: #1C1816;
+            --bg-card: #26211E;
+            --bg-sidebar: #221D1A;
+            --text-main: #F3EFEA;
+            --text-muted: #A89E9A;
+            --accent: #C8A891;
+            --accent-hover: #D8B8A1;
+            --border: #3A322E;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            overflow-x: hidden;
+        }
+
+        aside {
+            width: 280px;
+            background-color: var(--bg-sidebar);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 100;
+            transition: transform 0.3s ease;
+        }
+
+        .brand {
+            padding: 28px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .brand h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: 1px solid var(--border);
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--text-main);
+        }
+
+        .nav-links {
+            padding: 20px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            border-radius: var(--radius-sm);
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            cursor: pointer;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            transition: var(--transition);
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background-color: var(--bg-card);
+            color: var(--text-main);
+            box-shadow: var(--shadow);
+        }
+
+        main {
+            margin-left: 280px;
+            flex: 1;
+            padding: 40px;
+            max-width: calc(100vw - 280px);
+            min-height: 100vh;
+        }
+
+        header.top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .search-bar {
+            flex: 1;
+            min-width: 240px;
+            position: relative;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 12px 16px 12px 42px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border);
+            background-color: var(--bg-card);
+            color: var(--text-main);
+            font-size: 0.95rem;
+            outline: none;
+        }
+
+        .search-bar span {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+
+        .actions-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .btn {
+            background-color: var(--accent);
+            color: #fff;
+            border: none;
+            padding: 12px 20px;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: var(--transition);
+        }
+
+        .btn:hover { background-color: var(--accent-hover); }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 12px 20px;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-outline:hover { background-color: var(--bg-sidebar); }
+
+        .view-controls-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 10px 16px;
+            border-radius: var(--radius-md);
+            margin-bottom: 24px;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .filter-select {
+            padding: 6px 12px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            background: var(--bg-main);
+            color: var(--text-main);
+            font-size: 0.85rem;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .view-mode-btns {
+            display: flex;
+            gap: 6px;
+        }
+
+        .view-mode-btn {
+            background: none;
+            border: 1px solid var(--border);
+            padding: 6px 12px;
+            border-radius: var(--radius-sm);
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            color: var(--text-muted);
+            transition: var(--transition);
+        }
+
+        .view-mode-btn.active {
+            background: var(--accent);
+            color: #fff;
+            border-color: var(--accent);
+        }
+
+        .view-section { display: none; }
+        .view-section.active { display: block; }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .metric-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .metric-card h3 {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+
+        .metric-card .value {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .items-grid.mode-tiles {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 16px;
+        }
+
+        .items-grid.mode-content {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .item-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .item-img-container {
+            width: 100%;
+            height: 160px;
+            background-color: var(--bg-sidebar);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .item-img-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .item-img-placeholder {
+            font-size: 2rem;
+            color: var(--text-muted);
+        }
+
+        .item-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(28, 24, 22, 0.8);
+            color: #fff;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .basket-indicator {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: #27ae60;
+            color: #fff;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+
+        .item-content {
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            flex: 1;
+        }
+
+        .item-category {
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--accent);
+        }
+
+        .item-title {
+            font-size: 1rem;
+            font-weight: 700;
+        }
+
+        .item-details {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .item-footer {
+            padding: 12px 16px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--bg-main);
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .item-price { font-weight: 700; font-size: 1rem; }
+        
+        .card-action-btns {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            width: 100%;
+            margin-top: 8px;
+            border-top: 1px dashed var(--border);
+            padding-top: 10px;
+        }
+
+        .action-btn-basket {
+            flex: 1;
+            background-color: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 8px 10px;
+            border-radius: var(--radius-sm);
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+        }
+
+        .action-btn-basket:hover {
+            border-color: var(--accent);
+        }
+
+        .action-btn-basket.in-basket {
+            background-color: #27ae60;
+            color: #fff;
+            border-color: #27ae60;
+        }
+
+        .action-btn-edit {
+            background: none;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 8px 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            color: var(--text-main);
+        }
+
+        .action-btn-edit:hover { border-color: var(--accent); color: var(--accent); }
+
+        .action-btn-delete {
+            background: none;
+            border: 1px solid rgba(231, 76, 60, 0.4);
+            border-radius: var(--radius-sm);
+            padding: 8px 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            color: #e74c3c;
+        }
+
+        .action-btn-delete:hover { background: rgba(231, 76, 60, 0.1); }
+
+        .workspace-layout {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .workspace-layout.with-details-pane {
+            grid-template-columns: 1fr 320px;
+        }
+
+        .details-pane {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            display: none;
+            flex-direction: column;
+            gap: 14px;
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+
+        .workspace-layout.with-details-pane .details-pane {
+            display: flex;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        .modal-header { padding: 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .modal-body { padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        .form-group label { font-size: 0.8rem; font-weight: 600; color: var(--text-muted); }
+        .form-control { padding: 10px 14px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: var(--bg-main); color: var(--text-main); font-size: 0.9rem; width: 100%; outline: none; }
+        .modal-footer { padding: 16px 20px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 10px; background: var(--bg-sidebar); }
+
+        .mobile-menu-toggle { display: none; background: none; border: none; font-size: 1.4rem; cursor: pointer; color: var(--text-main); }
+
+        @media (max-width: 900px) {
+            aside { transform: translateX(-100%); }
+            aside.open { transform: translateX(0); }
+            main { margin-left: 0; max-width: 100vw; padding: 16px; }
+            .mobile-menu-toggle { display: block; }
+            .workspace-layout.with-details-pane { grid-template-columns: 1fr; }
+            .details-pane { display: none !important; }
+        }
+    </style>
+</head>
+<body data-theme="light">
+
+    <aside id="sidebar">
+        <div class="brand">
+            <h1><span>👜</span> Zilan’s Basket</h1>
+            <button class="theme-toggle" onclick="toggleTheme()" id="themeToggleBtn">☀️</button>
+        </div>
+        <div class="nav-links">
+            <button class="nav-link active" onclick="switchView('dashboard')">🏠 Home</button>
+            <button class="nav-link" onclick="switchView('basket')">🛒 My Basket <span id="basketCountBadge" style="background:#27ae60; color:#fff; padding:2px 6px; border-radius:10px; font-size:0.75rem; margin-left:6px;">0</span></button>
+            <button class="nav-link" onclick="switchView('settings')">⚙️ Settings</button>
+        </div>
+    </aside>
+
+    <main>
+        <header class="top-bar">
+            <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
+            <div class="search-bar">
+                <span>🔍</span>
+                <input type="text" id="searchInput" placeholder="Search items..." oninput="handleSearch(this.value)">
+            </div>
+            <div class="actions-group">
+                <button class="btn" onclick="openAddModal()">+ Add Item</button>
+            </div>
+        </header>
+
+        <section id="view-dashboard" class="view-section active">
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <h3>Total Planned</h3>
+                    <div class="value" id="totalSpending">$0</div>
+                </div>
+                <div class="metric-card">
+                    <h3>Items Count</h3>
+                    <div class="value" id="totalItemsCount">0</div>
+                </div>
+            </div>
+
+            <div class="view-controls-bar">
+                <div class="filter-group">
+                    <label style="font-size:0.85rem; font-weight:600; color:var(--text-muted);">Status Filter:</label>
+                    <select class="filter-select" id="statusFilter" onchange="renderAll()">
+                        <option value="All">All Statuses</option>
+                        <option value="To Buy">To Buy</option>
+                        <option value="Need to Buy">Need to Buy</option>
+                        <option value="Wishlist">Wishlist</option>
+                        <option value="Bought">Bought</option>
+                    </select>
+                </div>
+                <div class="view-mode-btns">
+                    <button class="view-mode-btn active" id="btnTiles" onclick="setleyoutMode('tiles')">田 Tiles</button>
+                    <button class="view-mode-btn" id="btnContent" onclick="setleyoutMode('content')">☰ List</button>
+                    <button class="view-mode-btn" id="btnDetailsPane" onclick="toggleDetailsPane()">🗂️ Details</button>
+                </div>
+            </div>
+
+            <div class="workspace-layout" id="workspaceLayout">
+                <div>
+                    <div class="section-title">All Items</div>
+                    <div class="items-grid mode-tiles" id="dashboardItemsGrid"></div>
+                </div>
+                <div class="details-pane" id="detailsPane">
+                    <h3 style="font-size: 1rem; border-bottom: 1px solid var(--border); padding-bottom: 8px;">📋 Quick Info Pane</h3>
+                    <div id="detailsPaneContent" style="font-size: 0.85rem; color: var(--text-muted);">
+                        Select any item card to view its details instantly.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- MY BASKET SECTION -->
+        <section id="view-basket" class="view-section">
+            <div class="section-title">My Basket (Custom Selected Items)</div>
+            <div class="items-grid mode-tiles" id="basketItemsGrid"></div>
+        </section>
+
+        <section id="view-settings" class="view-section">
+            <div class="section-title">Settings</div>
+            <button class="btn btn-outline" onclick="toggleTheme()">Toggle Dark/Light Mode</button>
+        </section>
+    </main>
+
+    <!-- MODAL -->
+    <div class="modal-overlay" id="itemModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 id="modalTitle">Add New Item</h2>
+                <button class="btn-outline" style="border:none; background:none; cursor:pointer; font-size:1.1rem;" onclick="closeModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="editItemId">
+                <div class="form-group"><label>Item Name</label><input type="text" class="form-control" id="itemName" placeholder="e.g. Chanel Chance Perfume"></div>
+                <div class="form-group"><label>Category</label>
+                    <select class="form-control" id="itemCategory">
+                        <option>🌸 Perfume</option>
+                        <option>💄 Beauty</option>
+                        <option>💇‍♀️ Hair Care</option>
+                        <option>👗 Clothes</option>
+                        <option>👠 Shoes</option>
+                        <option>💍 Jewelry</option>
+                        <option>🍳 Kitchen</option>
+                        <option>💒 Wedding</option>
+                        <option>🚗 Car</option>
+                        <option>✈️ Travel</option>
+                        <option>🎁 Gifts</option>
+                        <option>📦 Other</option>
+                    </select>
+                </div>
+                <div class="form-group"><label>Store / Where to Buy</label><input type="text" class="form-control" id="itemStore" placeholder="e.g. Turkey, Shein, Local Shop"></div>
+                <div class="form-group"><label>Price ($)</label><input type="number" class="form-control" id="itemPrice" placeholder="0"></div>
+                <div class="form-group"><label>Status</label>
+                    <select class="form-control" id="itemStatus">
+                        <option>To Buy</option>
+                        <option>Need to Buy</option>
+                        <option>Wishlist</option>
+                        <option>Bought</option>
+                    </select>
+                </div>
+                <div class="form-group"><label>Image URL</label><input type="text" class="form-control" id="itemImage" placeholder="https://..."></div>
+                <div class="form-group"><label>Notes</label><textarea class="form-control" id="itemNotes" rows="2" placeholder="Extra notes..."></textarea></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+                <button class="btn" onclick="saveItem()">Save Item</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentMode = 'tiles';
+        let showDetailsPaneActive = false;
+
+        // Load items from localStorage if available, otherwise use defaults
+        let items = JSON.parse(localStorage.getItem('zilan_basket_items')) || [
+            { id: "1", name: "Chanel Chance Perfume", category: "🌸 Perfume", store: "Turkey", price: 111, status: "Wishlist", inBasket: false, image: "https://images.unsplash.com/photo-1541643600914-78b084683601?auto=format&fit=crop&w=600&q=80", notes: "Wonderful fragrance." },
+            { id: "2", name: "Kitchen Towels Set", category: "🍳 Kitchen", store: "Shein", price: 25, status: "To Buy", inBasket: true, image: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=600&q=80", notes: "Needed soon." }
+        ];
+
+        function saveToStorage() {
+            localStorage.setItem('zilan_basket_items', JSON.stringify(items));
+        }
+
+        document.addEventListener("DOMContentLoaded", () => { renderAll(); });
+
+        function switchView(id) {
+            document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            document.getElementById(`view-${id}`).classList.add('active');
+            event.currentTarget.classList.add('active');
+            if(window.innerWidth <= 900) document.getElementById('sidebar').classList.remove('open');
+        }
+
+        function toggleMobileMenu() { document.getElementById('sidebar').classList.toggle('open'); }
+        
+        function toggleTheme() {
+            const body = document.body;
+            const t = body.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+            body.setAttribute('data-theme', t);
+            document.getElementById('themeToggleBtn').textContent = t === 'light' ? '☀️' : '🌙';
+        }
+
+        function setleyoutMode(mode) {
+            currentMode = mode;
+            document.getElementById('btnTiles').classList.toggle('active', mode === 'tiles');
+            document.getElementById('btnContent').classList.toggle('active', mode === 'content');
+            renderAll();
+        }
+
+        function toggleDetailsPane() {
+            showDetailsPaneActive = !showDetailsPaneActive;
+            document.getElementById('btnDetailsPane').classList.toggle('active', showDetailsPaneActive);
+            document.getElementById('workspaceLayout').classList.toggle('with-details-pane', showDetailsPaneActive);
+            if(showDetailsPaneActive && items.length > 0) {
+                selectItemForDetails(items[0]);
+            }
+        }
+
+        function selectItemForDetails(item) {
+            const pane = document.getElementById('detailsPaneContent');
+            pane.innerHTML = `
+                <div style="font-weight:700; font-size:1.05rem; color:var(--text-main); margin-bottom:4px;">${item.name}</div>
+                <div><strong>Category:</strong> ${item.category}</div>
+                <div><strong>Store:</strong> ${item.store}</div>
+                <div><strong>Price:</strong> $${item.price}</div>
+                <div><strong>Status:</strong> ${item.status}</div>
+                <div><strong>In Basket:</strong> ${item.inBasket ? 'Yes 🛒' : 'No'}</div>
+                <div style="margin-top:8px; padding-top:8px; border-top:1px solid var(--border);"><strong>Notes:</strong> ${item.notes || 'No extra notes'}</div>
+            `;
+        }
+
+        function toggleBasketStatus(id) {
+            const item = items.find(i => i.id === id);
+            if(item) {
+                item.inBasket = !item.inBasket;
+                saveToStorage();
+                renderAll();
+            }
+        }
+
+        function renderAll() {
+            const selectedStatus = document.getElementById('statusFilter').value;
+            let filteredItems = items;
+            if(selectedStatus !== 'All') {
+                filteredItems = items.filter(i => i.status === selectedStatus);
+            }
+
+            renderGrid('dashboardItemsGrid', filteredItems);
+            
+            const basketItems = items.filter(i => i.inBasket);
+            renderGrid('basketItemsGrid', basketItems);
+
+            document.getElementById('basketCountBadge').textContent = basketItems.length;
+            document.getElementById('totalSpending').textContent = '$' + items.reduce((a,b)=>a+b.price,0);
+            document.getElementById('totalItemsCount').textContent = items.length;
+        }
+
+        function renderGrid(elementId, dataList) {
+            const grid = document.getElementById(elementId);
+            grid.className = `items-grid mode-${currentMode}`;
+            grid.innerHTML = '';
+            if(dataList.length === 0) {
+                grid.innerHTML = `<div style="color:var(--text-muted); padding:20px;">No items found.</div>`;
+                return;
+            }
+            dataList.forEach(item => {
+                const imgHTML = item.image ? `<img src="${item.image}">` : `<div class="item-img-placeholder">🛒</div>`;
+                const basketTag = item.inBasket ? `<div class="basket-indicator">🛒 In Basket</div>` : '';
+                const basketBtnText = item.inBasket ? '✓ In Basket' : '+ Add to Basket';
+                const basketBtnClass = item.inBasket ? 'action-btn-basket in-basket' : 'action-btn-basket';
+                
+                grid.innerHTML += `
+                    <div class="item-card" onclick="selectItemForDetails(${JSON.stringify(item).replace(/"/g, '&quot;')})">
+                        <div class="item-img-container">
+                            ${imgHTML}
+                            <div class="item-badge">${item.status}</div>
+                            ${basketTag}
+                        </div>
+                        <div class="item-content">
+                            <div class="item-category">${item.category}</div>
+                            <div class="item-title">${item.name}</div>
+                            <div class="item-details">Store: <strong>${item.store}</strong></div>
+                            
+                            <div class="card-action-btns" onclick="event.stopPropagation()">
+                                <button class="${basketBtnClass}" onclick="toggleBasketStatus('${item.id}')">${basketBtnText}</button>
+                                <button class="action-btn-edit" onclick="openEditModal('${item.id}')">✏️ Edit</button>
+                                <button class="action-btn-delete" onclick="deleteItem('${item.id}')">🗑️ Delete</button>
+                            </div>
+                        </div>
+                        <div class="item-footer">
+                            <div class="item-price">$${item.price}</div>
+                            <div style="font-size: 0.75rem; color: var(--text-muted);">${item.store}</div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function openAddModal() { 
+            document.getElementById('modalTitle').textContent = 'Add New Item';
+            document.getElementById('editItemId').value = '';
+            document.getElementById('itemName').value = '';
+            document.getElementById('itemStore').value = '';
+            document.getElementById('itemPrice').value = '';
+            document.getElementById('itemImage').value = '';
+            document.getElementById('itemNotes').value = '';
+            document.getElementById('itemStatus').value = 'To Buy';
+            document.getElementById('itemModal').classList.add('open'); 
+        }
+
+        function openEditModal(id) {
+            const item = items.find(i => i.id === id);
+            if(!item) return;
+            document.getElementById('modalTitle').textContent = 'Edit Item';
+            document.getElementById('editItemId').value = item.id;
+            document.getElementById('itemName').value = item.name;
+            document.getElementById('itemCategory').value = item.category;
+            document.getElementById('itemStore').value = item.store;
+            document.getElementById('itemPrice').value = item.price;
+            document.getElementById('itemStatus').value = item.status;
+            document.getElementById('itemImage').value = item.image;
+            document.getElementById('itemNotes').value = item.notes;
+            document.getElementById('itemModal').classList.add('open');
+        }
+
+        function closeModal() { document.getElementById('itemModal').classList.remove('open'); }
+
+        function saveItem() {
+            const name = document.getElementById('itemName').value.trim();
+            if(!name) {
+                alert('Please enter an item name.');
+                return;
+            }
+
+            const editId = document.getElementById('editItemId').value;
+            
+            if(editId) {
+                const item = items.find(i => i.id === editId);
+                if(item) {
+                    item.name = name;
+                    item.category = document.getElementById('itemCategory').value;
+                    item.store = document.getElementById('itemStore').value.trim() || 'General';
+                    item.price = parseFloat(document.getElementById('itemPrice').value) || 0;
+                    item.status = document.getElementById('itemStatus').value;
+                    item.image = document.getElementById('itemImage').value.trim();
+                    item.notes = document.getElementById('itemNotes').value.trim();
+                }
+            } else {
+                const newItem = {
+                    id: Date.now().toString(),
+                    name: name,
+                    category: document.getElementById('itemCategory').value,
+                    store: document.getElementById('itemStore').value.trim() || 'General',
+                    price: parseFloat(document.getElementById('itemPrice').value) || 0,
+                    status: document.getElementById('itemStatus').value,
+                    inBasket: false,
+                    image: document.getElementById('itemImage').value.trim(),
+                    notes: document.getElementById('itemNotes').value.trim()
+                };
+                items.push(newItem);
+                if(showDetailsPaneActive) selectItemForDetails(newItem);
+            }
+
+            saveToStorage();
+            closeModal();
+            renderAll();
+        }
+
+        function deleteItem(id) {
+            items = items.filter(i => i.id !== id);
+            saveToStorage();
+            renderAll();
+        }
+
+        function handleSearch(q) {
+            const filtered = items.filter(i => i.name.toLowerCase().includes(q.toLowerCase()));
+            renderGrid('dashboardItemsGrid', filtered);
+        }
+    </script>
+</body>
+</html>
